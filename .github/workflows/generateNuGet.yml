@@ -1,0 +1,64 @@
+name: Generate NuGet Packages
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+    inputs:
+      runtime:
+        description: Check this box to generate runtime packages on NuGet
+        type: boolean
+        default: true
+      apps:
+        description: Comma separated list of apps to generate packages for
+        required: true
+      dependencies:
+        description: Comma separated list of dependencies to publish before generating runtime packages
+        required: true
+      artifactVersion:
+        description: Business Central version to generate packages for/with (leave empty for default)
+        required: false
+      artifactOnPrem:
+        description: Check this box to use on-prem Business Central artifacts
+        type: boolean
+        default: false
+
+jobs:
+  DetermineArtifacts:
+    if: github.event.inputs.runtime == 'true'
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Determine Artifacts
+        env:
+          nugetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+        run: |
+          . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
+
+  GenerateRuntimeNuGetPackages:
+    if: github.event.inputs.runtime == 'true'
+    needs: [ DetermineArtifacts ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate Runtime NuGet Packages
+        env:
+          nugetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+        run: |
+          . (Join-Path $env:GITHUB_WORKSPACE "GenerateRuntimeNuGetPackages.ps1")
+
+  GenerateNuGetPackages:
+    if: github.event.inputs.runtime == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate NuGet Packages
+        env:
+          nugetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+        run: |
+          . (Join-Path $env:GITHUB_WORKSPACE "GenerateNuGetPackages.ps1")
