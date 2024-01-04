@@ -100,8 +100,8 @@ else {
             }
         }
     }
-    $artifactsNeeded = @($artifactsNeeded | Select-Object -Unique | ForEach-Object { "$_" })
+    $artifactsNeeded = @($artifactsNeeded | Select-Object -Unique)
 }
 Write-Host "Artifacts needed:"
 $artifactsNeeded | ForEach-Object { Write-Host "- $_" }
-Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactsNeeded=$($artifactsNeeded | ConvertTo-Json -Compress)" -Encoding UTF8
+Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactsNeeded=$(ConvertTo-Json -InputObject @($artifactsNeeded | ForEach-Object { "$_" }) -Compress)" -Encoding UTF8
