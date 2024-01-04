@@ -102,6 +102,6 @@ else {
     }
     $artifactsNeeded = @($artifactsNeeded | Select-Object -Unique)
 }
-Write-Host "------------------------------------------"
-Write-Host -ForegroundColor Yellow $artifactsNeeded
-Write-Host "------------------------------------------"
+Write-Host "Artifacts needed:"
+$artifactsNeeded | ForEach-Object { Write-Host "- $_" }
+Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactsNeeded=$($artifactsNeeded | ConvertTo-Json -Compress)" -Encoding UTF8
