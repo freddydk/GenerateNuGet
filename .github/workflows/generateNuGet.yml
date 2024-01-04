@@ -60,7 +60,7 @@ jobs:
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
   GenerateRuntimeNuGetPackages:
-    name: Generate Runtime NuGet Packages
+    name: BC Runtime
     if: github.event.inputs.runtime == 'true'
     needs: [ DetermineArtifacts ]
     runs-on: [ windows-latest ]
