@@ -24,6 +24,7 @@ on:
 
 jobs:
   DetermineArtifacts:
+    name: Determine Business Central Artifacts
     if: github.event.inputs.runtime == 'true'
     runs-on: [ ubuntu-latest ]
     steps:
@@ -34,10 +35,15 @@ jobs:
         env:
           nugetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps }}
+          dependencies: ${{ github.event.inputs.dependencies }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion }}
+          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
   GenerateRuntimeNuGetPackages:
+    name: Generate Runtime NuGet Packages
     if: github.event.inputs.runtime == 'true'
     needs: [ DetermineArtifacts ]
     runs-on: ubuntu-latest
@@ -49,10 +55,15 @@ jobs:
         env:
           nugetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps }}
+          dependencies: ${{ github.event.inputs.dependencies }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion }}
+          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateRuntimeNuGetPackages.ps1")
 
   GenerateNuGetPackages:
+    name: Generate NuGet Packages
     if: github.event.inputs.runtime == 'false'
     runs-on: ubuntu-latest
     steps:
@@ -63,5 +74,9 @@ jobs:
         env:
           nugetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps }}
+          dependencies: ${{ github.event.inputs.dependencies }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion }}
+          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateNuGetPackages.ps1")
