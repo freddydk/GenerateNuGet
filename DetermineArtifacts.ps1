@@ -100,7 +100,7 @@ else {
             }
         }
     }
-    $artifactsNeeded = @($artifactsNeeded | Select-Object -Unique)
+    $artifactsNeeded = @($artifactsNeeded | Select-Object -Unique | ForEach-Object { "$_" })
 }
 Write-Host "Artifacts needed:"
 $artifactsNeeded | ForEach-Object { Write-Host "- $_" }
