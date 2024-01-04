@@ -10,7 +10,7 @@ $apps = @(CopyAppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $apps
 $dependenciesFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
 $dependencies = @(CopyAppFilesToFolder -appFiles @("$env:dependencies".Split(',')) -folder $dependenciesFolder)
 
-$type = @("sandbox","onprem")[$env:artifactOnPrem]
+$type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
 $artifactVersion = $env:artifactVersion
 $nugetServerUrl = $env:nugetServerUrl
 $nugetToken = $env:nugetToken
