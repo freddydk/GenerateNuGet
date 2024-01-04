@@ -1,4 +1,4 @@
-$bcContainerHelperPath = 'https://github.com/freddydk/navcontainerhelper/archive/refs/heads/nuget.zip'
+$bcContainerHelperVersion = 'https://github.com/freddydk/navcontainerhelper/archive/refs/heads/nuget.zip'
 
 $tempName = Join-Path ([System.IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString())
 Write-Host "Downloading BcContainerHelper developer version from $bcContainerHelperVersion"
