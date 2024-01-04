@@ -64,6 +64,10 @@ jobs:
     if: github.event.inputs.runtime == 'true'
     needs: [ DetermineArtifacts ]
     runs-on: [ windows-latest ]
+    strategy:
+      matrix:
+        include: ${{ needs.DetermineArtifacts.outputs.artifactsNeeded }}
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
 
@@ -78,7 +82,7 @@ jobs:
           additionalCountries: ${{ github.event.inputs.additionalCountries }}
           artifactVersion: ${{ github.event.inputs.artifactVersion }}
           artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
-          artifactsNeeded: ${{ needs.DetermineArtifacts.outputs.artifactsNeeded }}
+          artifact: ${{ matrix.artifact }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateRuntimeNuGetPackages.ps1")
 

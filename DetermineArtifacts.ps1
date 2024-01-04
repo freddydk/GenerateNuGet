@@ -104,4 +104,4 @@ else {
 }
 Write-Host "Artifacts needed:"
 $artifactsNeeded | ForEach-Object { Write-Host "- $_" }
-Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactsNeeded=$(ConvertTo-Json -InputObject @($artifactsNeeded | ForEach-Object { "$_" }) -Compress)" -Encoding UTF8
+Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactsNeeded=$(ConvertTo-Json -InputObject @($artifactsNeeded | ForEach-Object { @{ "artifact" = "$_" } }) -Compress)" -Encoding UTF8
