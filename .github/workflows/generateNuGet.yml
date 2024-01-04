@@ -53,6 +53,7 @@ jobs:
           artifactVersion: ${{ github.event.inputs.artifactVersion }}
           artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
         run: |
+          Write-Host "apps: $env:apps"
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
   GenerateRuntimeNuGetPackages:

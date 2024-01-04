@@ -2,8 +2,10 @@ Write-Host "Determine Artifacts"
 
 . (Join-Path $PSScriptRoot "HelperFunctions.ps1")
 
+Write-Host "apps: $env:apps"
+
 $appsFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
-$apps = @(CopyAppFilesToFolder -appFiles @("$env.apps".Split(',')) -folder $appsFolder)
+$apps = @(CopyAppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
 
 $dependenciesFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
 $dependencies = @(CopyAppFilesToFolder -appFiles @("$env:dependencies".Split(',')) -folder $dependenciesFolder)
