@@ -43,7 +43,8 @@ jobs:
     if: github.event.inputs.runtime == 'true'
     runs-on: [ ubuntu-latest ]
     outputs:
-      artifactsNeeded: ${{ steps.determineArtifacts.outputs.ArtifactsNeeded }}
+      artifactVersions: ${{ steps.determineArtifacts.outputs.ArtifactVersions }}
+      artifactVersionCount: ${{ steps.determineArtifacts.outputs.ArtifactVersionCount }}
       runtimeDependencyPackageIds: ${{ steps.determineArtifacts.outputs.RuntimeDependencyPackageIds }}
     steps:
       - uses: actions/checkout@v3
@@ -66,12 +67,12 @@ jobs:
 
   GenerateRuntimeNuGetPackages:
     name: Runtime
-    if: github.event.inputs.runtime == 'true'
     needs: [ DetermineArtifacts ]
+    if: github.event.inputs.runtime == 'true' && needs.DetermineArtifacts.outputs.artifactVersionCount > 0
     runs-on: [ windows-latest ]
     strategy:
       matrix:
-        include: ${{ fromJson(needs.DetermineArtifacts.outputs.artifactsNeeded) }}
+        include: ${{ fromJson(needs.DetermineArtifacts.outputs.artifactVersions) }}
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -86,15 +87,16 @@ jobs:
           country: ${{ github.event.inputs.country }}
           additionalCountries: ${{ github.event.inputs.additionalCountries }}
           artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
-          artifactVersion: ${{ matrix.artifact }}
+          artifactVersion: ${{ matrix.artifactVersion }}
+          incompatibleArtifactVersion: ${{ matrix.incompatibleArtifactVersion }}
           runtimeDependencyPackageIds: ${{ needs.DetermineArtifacts.outputs.runtimeDependencyPackageIds }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateRuntimeNuGetPackages.ps1")
 
   GenerateIndirectNuGetPackage:
     name: Generate Indirect NuGet Package
-    if: github.event.inputs.runtime == 'true'
-    needs: [ GenerateRuntimeNuGetPackages ]
+    needs: [ DetermineArtifacts, GenerateRuntimeNuGetPackages ]
+    if: github.event.inputs.runtime == 'true' && needs.DetermineArtifacts.outputs.artifactVersionCount > 0
     runs-on: [ ubuntu-latest ]
     steps:
       - uses: actions/checkout@v3

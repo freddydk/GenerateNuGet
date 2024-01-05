@@ -2,102 +2,45 @@ Write-Host "Determine Artifacts"
 
 . (Join-Path $PSScriptRoot "HelperFunctions.ps1")
 
+# Get array of apps
 $appsFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
 $apps = @(Copy-AppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
 
-$type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
-$artifactVersion = $env:artifactVersion
+# Get workflow input
 $nuGetServerUrl = $env:nuGetServerUrl
 $nuGetToken = $env:nuGetToken
+$type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
 $country = $env:country
+$artifactVersion = $env:artifactVersion
 
-# Determine BC artifacts needed for building missing runtime packages
+
+
 # Find the highest application dependency for the apps in order to determine which BC Application version to use for runtime packages
-$highestApplicationDependency = '1.0.0.0'
+$highestApplicationDependency = GetHighestApplicationDependency -apps $apps
 
-$allArtifacts = $false
-$runtimeDependencyPackageIds = @{}
-$artifactsNeeded = @()
-
-foreach($appFile in $apps) {
-    $appName = [System.IO.Path]::GetFileName($appFile)
-    $appJson = Get-AppJsonFromAppFile -appFile $appFile
-
-    # Determine Application Dependency for this app
-    if ($appJson.PSObject.Properties.Name -eq "Application") {
-        $applicationDependency = $appJson.application
-    }
-    else {
-        $baseAppDependency = $appJson.dependencies | Where-Object { $_.Name -eq "Base Application" -and $_.Publisher -eq "Microsoft" }
-        if ($baseAppDependency) {
-            $applicationDependency = $baseAppDependency.Version
-        }
-        else {
-            throw "Cannot determine application dependency for $appFile"
-        }
-    }
-
-    # Determine highest application dependency for all apps
-    if ([System.Version]$applicationDependency -gt [System.Version]$highestApplicationDependency) {
-        $highestApplicationDependency = $applicationDependency
-    }
-
-    # Test whether a NuGet package exists for this app?
-    $package = Get-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -packageName $appJson.id -version $appJson.version -select Exact
-    if (-not $package) {
-        # If just one of the apps doesn't exist as a nuGet package, we need to create a new indirect nuGet package and build all runtime versions of the nuGet
-        $package = Join-Path ([System.IO.Path]::GetTempPath()) ([GUID]::NewGuid().ToString())
-        New-BcNuGetPackage -appfile $appFile -isIndirectPackage -runtimeDependencyId '{publisher}.{name}.runtime-{version}' -destinationFolder $package | Out-Null
-        $allArtifacts = $true
-    }
-    $runTimeDependencyPackageId = GetRuntimeDependencyPackageId -package $package
-    $runtimeDependencyPackageIds += @{ $appName = $runTimeDependencyPackageId }
-}
+# Determine runtime dependency package ids for all apps and whether any of the apps doesn't exist as a nuGet package
+$runtimeDependencyPackageIds, $newPackage = GetRuntimeDependencyPackageIds -apps $apps
 
 # Determine which artifacts are needed for any of the apps
-$artifactVersions = @()
-$applicationVersion = [System.Version]$highestApplicationDependency
-while ($true) {
-    $artifacturl = Get-BCArtifactUrl -type $type -country $country -version "$applicationVersion" -select Closest
-    if ($artifacturl) {
-        $artifactVersions += @([System.Version]($artifacturl.split('/')[4]))
-        $applicationVersion = [System.Version]"$($applicationVersion.Major).$($applicationVersion.Minor+1).0.0"
-    }
-    elseif ($applicationVersion.Minor -eq 0) {
-        break
-    }
-    else {
-        $applicationVersion = [System.Version]"$($applicationVersion.Major+1).0.0.0"
-    }
-}
+$allArtifactVersions = @(GetArtifactVersionsSince -type $type -country $country -version "$highestApplicationDependency")
 
-if ($allArtifacts) {
-    # all artifacts are needed
-    $artifactsNeeded = $artifactVersions
+if ($newPackage) {
+    # If a new package is to be created, all artifacts are needed
+    $artifactVersions = $allArtifactVersions
 }
 else {
     # all indirect packages exists - determine which runtime package versions doesn't exist for the app
-    # Look for latest artifacts first
-    [Array]::Reverse($artifactVersions)
-    # Search for runtime nuGet packages for all apps
-    foreach($appFile in $apps) {
-        $appName = [System.IO.Path]::GetFileName($appFile)
-        foreach($artifactVersion in $artifactVersions) {
-            $runtimeDependencyPackageId = $runtimeDependencyPackageIds."$appName"    
-            $package = Get-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -packageName $runtimeDependencyPackageId -version "$artifactVersion" -select Exact
-            if ($package) {
-                break
-            }
-            else {
-                $artifactsNeeded += @($artifactVersion)
-            }
-        }
-    }
-    $artifactsNeeded = @($artifactsNeeded | Select-Object -Unique)
+    $artifactVersions = @(GetArtifactVersionsNeeded -apps $apps -artifactVersions $artifactVersions -runtimeDependencyPackageIds $runtimeDependencyPackageIds -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken)
 }
-Write-Host "Artifacts needed:"
-$artifactsNeeded | ForEach-Object { Write-Host "- $_" }
-Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactsNeeded=$(ConvertTo-Json -InputObject @($artifactsNeeded | ForEach-Object { @{ "artifact" = "$_" } }) -Compress)" -Encoding UTF8
+
+$artifactVersions = @($artifactVersions | ForEach-Object { @{ "artifactVersion" = "$_"; "incompatibleArtifactVersion" = "$($_.Major).$($_.Minor+1)" } })
+
+
+
+Write-Host "Artifact versions:"
+$artifactVersions | ForEach-Object { Write-Host "- $_" }
+Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactVersions=$(ConvertTo-Json -InputObject @($artifactVersions) -Compress)" -Encoding UTF8
+Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactVersionCount=$($artifactVersions.Count)" -Encoding UTF8
 
 Write-Host "RuntimeDependencyPackageIds:"
 $runtimeDependencyPackageIds.Keys | ForEach-Object { Write-Host "- $_ = $($runtimeDependencyPackageIds."$_")" }
