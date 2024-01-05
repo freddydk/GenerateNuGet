@@ -5,13 +5,13 @@ on:
   workflow_dispatch:
     inputs:
       apps:
-        description: Comma separated list of apps to generate packages for
+        description: Comma separated list of apps to generate packages for (leave empty to use APPS variable)
         required: false
-        default: 'https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/BO-DK-main-Apps-2.0.200.0.zip'
+        default: ''
       nuGetServerUrl:
-        description: NuGet server URL
+        description: NuGet server URL (leave empty to use NUGETSERVERURL variable)
         required: false
-        default: ${{ vars.NuGetServerUrl }}
+        default: ''
 
 jobs:
   GenerateNuGetPackages:
@@ -24,7 +24,7 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
-          apps: ${{ github.event.inputs.apps }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateNuGetPackages.ps1")

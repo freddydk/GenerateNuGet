@@ -5,23 +5,23 @@ on:
   workflow_dispatch:
     inputs:
       apps:
-        description: Comma separated list of apps to generate packages for
+        description: Comma separated list of apps to generate packages for (leave empty to use APPS variable)
         required: false
-        default: 'https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/BO-DK-main-Apps-2.0.200.0.zip'
+        default: ''
       dependencies:
-        description: Comma separated list of dependencies to publish before generating runtime packages
+        description: Comma separated list of dependencies to publish before generating runtime packages (leave empty to use DEPENDENCIES variable)
         required: false
-        default: 'https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/Common-main-Apps-2.0.200.0.zip,https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/Misc-main-Apps-2.0.200.0.zip,https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/BO-W1-main-Apps-2.0.200.0.zip'
+        default: ''
       country:
-        description: Country for the main runtime version in the NuGet package (default is w1)
+        description: Country for the main runtime version in the NuGet package (leave empty to use COUNTRY variable, default is w1)
         required: false
-        default: 'dk'
+        default: ''
       additionalCountries:
-        description: Comma separated list of additional countries to include in the NuGet package (leave empty for none)
+        description: Comma separated list of additional countries to include in the NuGet package (leave empty to use ADDITIONALCOUNTRIES variable, default is none)
         required: false
         default: ''
       artifactVersion:
-        description: Business Central artifacts version (leave empty to calculate or specific version to use)
+        description: Business Central artifacts version (leave empty to use ARTIFACTVERSION variable, default is to auto-calculate needed artifacts)
         required: false
         default: ''
       artifactOnPrem:
@@ -29,9 +29,9 @@ on:
         type: boolean
         default: false
       nuGetServerUrl:
-        description: NuGet server URL
+        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL variable)
         required: false
-        default: '${{ vars.RuntimeNuGetServerUrl }}'
+        default: ''
 
 jobs:
   DetermineArtifacts:
@@ -49,13 +49,13 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
-          apps: ${{ github.event.inputs.apps }}
-          dependencies: ${{ github.event.inputs.dependencies }}
-          country: ${{ github.event.inputs.country }}
-          additionalCountries: ${{ github.event.inputs.additionalCountries }}
-          artifactVersion: ${{ github.event.inputs.artifactVersion }}
-          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
+          nuGetServerUrl: '${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}'
+          apps: '${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}'
+          dependencies: '${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}'
+          country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
+          additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
+          artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
+          artifactOnPrem: '${{ github.event.inputs.artifactOnPrem != '' && github.event.inputs.artifactOnPrem || vars.ARTIFACTONPREM }}'
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
@@ -75,13 +75,13 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
-          apps: ${{ github.event.inputs.apps }}
-          dependencies: ${{ github.event.inputs.dependencies }}
-          country: ${{ github.event.inputs.country }}
-          additionalCountries: ${{ github.event.inputs.additionalCountries }}
-          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
-          artifactVersion: ${{ matrix.artifactVersion }}
+          nuGetServerUrl: '${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}'
+          apps: '${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}'
+          dependencies: '${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}'
+          country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
+          additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
+          artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
+          artifactOnPrem: '${{ github.event.inputs.artifactOnPrem != '' && github.event.inputs.artifactOnPrem || vars.ARTIFACTONPREM }}'
           incompatibleArtifactVersion: ${{ matrix.incompatibleArtifactVersion }}
           runtimeDependencyPackageIds: ${{ needs.DetermineArtifacts.outputs.runtimeDependencyPackageIds }}
         run: |
@@ -99,12 +99,12 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
-          apps: ${{ github.event.inputs.apps }}
-          dependencies: ${{ github.event.inputs.dependencies }}
-          country: ${{ github.event.inputs.country }}
-          additionalCountries: ${{ github.event.inputs.additionalCountries }}
-          artifactVersion: ${{ github.event.inputs.artifactVersion }}
-          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
+          nuGetServerUrl: '${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}'
+          apps: '${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}'
+          dependencies: '${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}'
+          country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
+          additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
+          artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
+          artifactOnPrem: '${{ github.event.inputs.artifactOnPrem != '' && github.event.inputs.artifactOnPrem || vars.ARTIFACTONPREM }}'
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateIndirectPackage.ps1")
