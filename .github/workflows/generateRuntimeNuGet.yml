@@ -13,15 +13,15 @@ on:
         required: false
         default: 'https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/Common-main-Apps-2.0.200.0.zip,https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/Misc-main-Apps-2.0.200.0.zip,https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/BO-W1-main-Apps-2.0.200.0.zip'
       country:
-        description: Country to generate packages for/with (default is w1)
+        description: Country for the main runtime version in the NuGet package (default is w1)
         required: false
         default: 'dk'
       additionalCountries:
-        description: Comma separated list of additional countries to generate packages for/with (leave empty for none)
+        description: Comma separated list of additional countries to include in the NuGet package (leave empty for none)
         required: false
         default: ''
       artifactVersion:
-        description: Business Central version to generate packages for/with (leave empty for default)
+        description: Business Central artifacts version (leave empty to calculate or specific version to use)
         required: false
         default: ''
       artifactOnPrem:
@@ -31,7 +31,7 @@ on:
       nuGetServerUrl:
         description: NuGet server URL
         required: false
-        default: 'https://pkgs.dev.azure.com/freddydk/apps/_packaging/MyRuntimePackages8/nuget/v3/index.json'
+        default: '${{ vars.RuntimeNuGetServerUrl }}'
 
 jobs:
   DetermineArtifacts:
@@ -57,7 +57,6 @@ jobs:
           artifactVersion: ${{ github.event.inputs.artifactVersion }}
           artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
         run: |
-          Write-Host "apps: $env:apps"
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
   GenerateRuntimeNuGetPackages:
@@ -108,5 +107,4 @@ jobs:
           artifactVersion: ${{ github.event.inputs.artifactVersion }}
           artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
         run: |
-          Write-Host "apps: $env:apps"
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateIndirectPackage.ps1")

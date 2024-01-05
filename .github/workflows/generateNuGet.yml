@@ -11,7 +11,7 @@ on:
       nuGetServerUrl:
         description: NuGet server URL
         required: false
-        default: 'https://pkgs.dev.azure.com/freddydk/apps/_packaging/MyApps2/nuget/v3/index.json'
+        default: '${{ vars.NuGetServerUrl }}'
 
 jobs:
   GenerateNuGetPackages:
