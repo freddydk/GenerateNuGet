@@ -9,7 +9,7 @@ on:
         required: false
         default: ''
       nuGetServerUrl:
-        description: NuGet server URL (leave empty to use NUGETSERVERURL secret)
+        description: NuGet server URL (leave empty to use NUGETSERVERURL variable)
         required: false
         default: ''
       nuGetToken:
@@ -28,7 +28,7 @@ jobs:
           if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
             $eventPath = Get-Content -Encoding UTF8 -Path $env:GITHUB_EVENT_PATH -Raw | ConvertFrom-Json
             if ($null -ne $eventPath.inputs) {
-              $eventPath.inputs.psObject.Properties | Where-Object { @('Apps','Dependencies','NuGetServerUrl','NuGetToken') -contains $_.Name } | ForEach-Object {
+              $eventPath.inputs.psObject.Properties | Where-Object { @('Apps','Dependencies','NuGetToken') -contains $_.Name } | ForEach-Object {
                 $property = $_.Name
                 $value = $eventPath.inputs."$property"
                 Write-Host "::add-mask::$value"
@@ -43,7 +43,7 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || secrets.NUGETSERVERURL }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateNuGetPackages.ps1")
