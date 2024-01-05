@@ -81,7 +81,6 @@ jobs:
           dependencies: ${{ github.event.inputs.dependencies }}
           country: ${{ github.event.inputs.country }}
           additionalCountries: ${{ github.event.inputs.additionalCountries }}
-          artifactVersion: ${{ github.event.inputs.artifactVersion }}
           artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
           artifactVersion: ${{ matrix.artifact }}
           runtimeDependencyPackageIds: ${{ needs.DetermineArtifacts.outputs.runtimeDependencyPackageIds }}

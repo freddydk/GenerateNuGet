@@ -17,7 +17,6 @@ $nugetToken = $env:nugetToken
 $country = $env:country
 $additionalCountries = @("$env:additionalCountries".Split(','))
 $runtimeDependencyPackageIds = $env:runtimedependencyPackageIds | ConvertFrom-Json
-$artifactVersion = $env:artifactVersion
 
 $artifacturl = Get-BCArtifactUrl -type $type -country $country -version $artifactVersion -select Closest
 $global:runtimeAppFiles = @{}
