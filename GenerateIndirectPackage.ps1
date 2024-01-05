@@ -45,14 +45,19 @@ foreach($appFile in $apps) {
 
     # Test whether a NuGet package exists for this app?
     $package = Get-BcNuGetPackage -nuGetServerUrl $nugetServerUrl -nuGetToken $nuGetToken -packageName $appJson.id -version $appJson.version -select Exact
-    if (-not $package) {
+    if ($package) {
+        # Package exists determine runtime dependency package id
+        $runTimeDependencyPackageId = GetRuntimeDependencyPackageId -package $package
+        $runtimeDependencyPackageIds += @{ $appName = $runtimeDependencyPackageId }
+    }
+    else {
         # If just one of the apps doesn't exist as a nuget package, we need to create a new indirect nuget package and build all runtime versions of the nuget
         $package = Join-Path ([System.IO.Path]::GetTempPath()) ([GUID]::NewGuid().ToString())
         New-BcNuGetPackage -appfile $appFile -isIndirectPackage -runtimeDependencyId '{publisher}.{name}.runtime-{version}' -destinationFolder $package | Out-Null
+        $runTimeDependencyPackageId = GetRuntimeDependencyPackageId -package $package
+        $runtimeDependencyPackageIds += @{ $appName = $runTimeDependencyPackageId }
         $allArtifacts = $true
     }
-    $runTimeDependencyPackageId = GetRuntimeDependencyPackageId -package $package
-    $runtimeDependencyPackageIds += @{ $appName = $runTimeDependencyPackageId }
 }
 
 # Determine which artifacts are needed for any of the apps
@@ -101,5 +106,5 @@ $artifactsNeeded | ForEach-Object { Write-Host "- $_" }
 Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactsNeeded=$(ConvertTo-Json -InputObject @($artifactsNeeded | ForEach-Object { @{ "artifact" = "$_" } }) -Compress)" -Encoding UTF8
 
 Write-Host "RuntimeDependencyPackageIds:"
-$runtimeDependencyPackageIds.Keys | ForEach-Object { Write-Host "- $_ = $($runtimeDependencyPackageIds."$_")" }
+$runtimeDependencyPackageIds | ForEach-Object { Write-Host "- $($_.Key) = $($_.Value)" }
 Add-Content -Path $ENV:GITHUB_OUTPUT -Value "RuntimeDependencyPackageId=$(ConvertTo-Json -InputObject $runtimeDependencyPackageIds -Compress)" -Encoding UTF8

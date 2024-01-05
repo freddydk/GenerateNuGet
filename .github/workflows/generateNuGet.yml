@@ -39,7 +39,8 @@ jobs:
     if: github.event.inputs.runtime == 'true'
     runs-on: [ ubuntu-latest ]
     outputs:
-      artifactsNeeded: ${{ steps.determineArtifacts.outputs.artifactsNeeded }}
+      artifactsNeeded: ${{ steps.determineArtifacts.outputs.ArtifactsNeeded }}
+      runtimeDependencyPackageIds: ${{ steps.determineArtifacts.outputs.RuntimeDependencyPackageIds }}
     steps:
       - uses: actions/checkout@v3
 
@@ -82,9 +83,33 @@ jobs:
           additionalCountries: ${{ github.event.inputs.additionalCountries }}
           artifactVersion: ${{ github.event.inputs.artifactVersion }}
           artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
-          artifact: ${{ matrix.artifact }}
+          artifactVersion: ${{ matrix.artifact }}
+          runtimeDependencyPackageIds: ${{ needs.DetermineArtifacts.outputs.runtimeDependencyPackageIds }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateRuntimeNuGetPackages.ps1")
+
+  GenerateIndirectNuGetPackages:
+    if: github.event.inputs.runtime == 'true'
+    needs: [ GenerateRuntimeNuGetPackages ]
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate Indirect NuGet Package
+        shell: pwsh
+        env:
+          nugetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps }}
+          dependencies: ${{ github.event.inputs.dependencies }}
+          country: ${{ github.event.inputs.country }}
+          additionalCountries: ${{ github.event.inputs.additionalCountries }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion }}
+          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
+        run: |
+          Write-Host "apps: $env:apps"
+          . (Join-Path $env:GITHUB_WORKSPACE "GenerateIndirectPackage.ps1")
+
 
   GenerateNuGetPackages:
     name: Generate NuGet Packages

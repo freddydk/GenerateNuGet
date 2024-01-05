@@ -8,21 +8,6 @@ Expand-Archive -Path "$tempName.zip" -DestinationPath "$tempName"
 Remove-Item "$tempName.zip"
 $bcContainerHelperPath = (Get-Item -Path (Join-Path $tempName "*\BcContainerHelper.ps1")).FullName
 . $bcContainerHelperPath
-$isPsCore = $PSVersionTable.PSVersion -ge "6.0.0"
-if ($isPsCore) {
-    $byteEncodingParam = @{ "asByteStream" = $true }
-    $allowUnencryptedAuthenticationParam = @{ "allowUnencryptedAuthentication" = $true }
-}
-else {
-    $byteEncodingParam = @{ "Encoding" = "byte" }
-    $allowUnencryptedAuthenticationParam = @{ }
-    $isWindows = $true
-    $isLinux = $false
-    $IsMacOS = $false
-}
-$helperFunctionsPath = (Get-Item -Path (Join-Path $tempName "*\HelperFunctions.ps1")).FullName
-. $helperFunctionsPath
-
 
 function GetRuntimeDependencyPackageId {
     Param(
