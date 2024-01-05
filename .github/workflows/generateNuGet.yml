@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       apps:
-        description: Comma separated list of apps to generate packages for (leave empty to use APPS variable)
+        description: Comma separated list of apps (leave empty to use APPS variable)
         required: false
         default: ''
       nuGetServerUrl:
