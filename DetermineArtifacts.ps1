@@ -7,8 +7,8 @@ $apps = @(Copy-AppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $app
 
 $type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
 $artifactVersion = $env:artifactVersion
-$nugetServerUrl = $env:nugetServerUrl
-$nugetToken = $env:nugetToken
+$nuGetServerUrl = $env:nuGetServerUrl
+$nuGetToken = $env:nuGetToken
 $country = $env:country
 
 # Determine BC artifacts needed for building missing runtime packages
@@ -43,9 +43,9 @@ foreach($appFile in $apps) {
     }
 
     # Test whether a NuGet package exists for this app?
-    $package = Get-BcNuGetPackage -nuGetServerUrl $nugetServerUrl -nuGetToken $nuGetToken -packageName $appJson.id -version $appJson.version -select Exact
+    $package = Get-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -packageName $appJson.id -version $appJson.version -select Exact
     if (-not $package) {
-        # If just one of the apps doesn't exist as a nuget package, we need to create a new indirect nuget package and build all runtime versions of the nuget
+        # If just one of the apps doesn't exist as a nuGet package, we need to create a new indirect nuGet package and build all runtime versions of the nuGet
         $package = Join-Path ([System.IO.Path]::GetTempPath()) ([GUID]::NewGuid().ToString())
         New-BcNuGetPackage -appfile $appFile -isIndirectPackage -runtimeDependencyId '{publisher}.{name}.runtime-{version}' -destinationFolder $package | Out-Null
         $allArtifacts = $true
@@ -79,12 +79,12 @@ else {
     # all indirect packages exists - determine which runtime package versions doesn't exist for the app
     # Look for latest artifacts first
     [Array]::Reverse($artifactVersions)
-    # Search for runtime nuget packages for all apps
+    # Search for runtime nuGet packages for all apps
     foreach($appFile in $apps) {
         $appName = [System.IO.Path]::GetFileName($appFile)
         foreach($artifactVersion in $artifactVersions) {
             $runtimeDependencyPackageId = $runtimeDependencyPackageIds."$appName"    
-            $package = Get-BcNuGetPackage -nuGetServerUrl $nugetServerUrl -nuGetToken $nuGetToken -packageName $runtimeDependencyPackageId -version "$artifactVersion" -select Exact
+            $package = Get-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -packageName $runtimeDependencyPackageId -version "$artifactVersion" -select Exact
             if ($package) {
                 break
             }

@@ -13,8 +13,8 @@ $dependencies = @(Copy-AppFilesToFolder -appFiles @("$env:dependencies".Split(',
 
 $type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
 $artifactVersion = $env:artifactVersion
-$nugetServerUrl = $env:nugetServerUrl
-$nugetToken = $env:nugetToken
+$nuGetServerUrl = $env:nuGetServerUrl
+$nuGetToken = $env:nuGetToken
 $country = $env:country
 $additionalCountries = @("$env:additionalCountries".Split(',') | Where-Object { $_ -and $_ -ne $country })
 $runtimeDependencyPackageIds = $env:runtimedependencyPackageIds | ConvertFrom-Json
@@ -38,11 +38,11 @@ foreach($ct in $additionalCountries) {
 }
 $nextVersion = "$(([System.Version]$artifactVersion).Major).$(([System.Version]$artifactVersion).Minor+1)"
 
-# For every app create and push nuget package
+# For every app create and push nuGet package
 foreach($appFile in $apps) {
     $appName = [System.IO.Path]::GetFileName($appFile)
     $runtimeDependencyPackageId = $runtimeDependencyPackageIds."$appName"    
-    $package = Get-BcNuGetPackage -nuGetServerUrl $nugetServerUrl -nuGetToken $nuGetToken -packageName $runtimeDependencyPackageId -version $artifactVersion -select Exact
+    $package = Get-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -packageName $runtimeDependencyPackageId -version $artifactVersion -select Exact
     if ($package) {
         # Package already exists in that exact version
         continue

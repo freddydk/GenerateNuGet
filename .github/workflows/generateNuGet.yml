@@ -52,7 +52,7 @@ jobs:
         id: determineArtifacts
         shell: pwsh
         env:
-          nugetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
           dependencies: ${{ github.event.inputs.dependencies }}
@@ -79,7 +79,7 @@ jobs:
       - name: Generate Runtime NuGet Packages
         shell: pwsh
         env:
-          nugetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
           dependencies: ${{ github.event.inputs.dependencies }}
@@ -102,7 +102,7 @@ jobs:
       - name: Generate Indirect NuGet Package
         shell: pwsh
         env:
-          nugetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
           dependencies: ${{ github.event.inputs.dependencies }}
@@ -125,7 +125,7 @@ jobs:
       - name: Generate NuGet Packages
         shell: pwsh
         env:
-          nugetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
         run: |
