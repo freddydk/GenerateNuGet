@@ -102,4 +102,4 @@ Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactsNeeded=$(ConvertTo-Json -I
 
 Write-Host "RuntimeDependencyPackageIds:"
 $runtimeDependencyPackageIds.Keys | ForEach-Object { Write-Host "- $_ = $($runtimeDependencyPackageIds."$_")" }
-Add-Content -Path $ENV:GITHUB_OUTPUT -Value "RuntimeDependencyPackageId=$(ConvertTo-Json -InputObject $runtimeDependencyPackageIds -Compress)" -Encoding UTF8
+Add-Content -Path $ENV:GITHUB_OUTPUT -Value "RuntimeDependencyPackageIds=$(ConvertTo-Json -InputObject $runtimeDependencyPackageIds -Compress)" -Encoding UTF8

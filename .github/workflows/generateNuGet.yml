@@ -87,7 +87,8 @@ jobs:
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateRuntimeNuGetPackages.ps1")
 
-  GenerateIndirectNuGetPackages:
+  GenerateIndirectNuGetPackage:
+    name: Generate Indirect NuGet Package
     if: github.event.inputs.runtime == 'true'
     needs: [ GenerateRuntimeNuGetPackages ]
     runs-on: [ ubuntu-latest ]

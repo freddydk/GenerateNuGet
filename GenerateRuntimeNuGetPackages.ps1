@@ -4,6 +4,7 @@ Write-Host "Generate Runtime NuGet Packages"
 
 $env:runtimedependencyPackageIds | Out-Host
 
+$containerName = 'bcserver'
 $appsFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
 $apps = @(Copy-AppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
 
