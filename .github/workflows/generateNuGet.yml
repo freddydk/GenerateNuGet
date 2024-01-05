@@ -31,4 +31,5 @@ jobs:
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
         run: |
+          Write-Host "::add-mask::$env:nuGetToken"
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateNuGetPackages.ps1")

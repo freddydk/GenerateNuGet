@@ -59,6 +59,7 @@ jobs:
           artifactVersion: ${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}
           artifactType: ${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}
         run: |
+          Write-Host "::add-mask::$env:nuGetToken"
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
   GenerateRuntimeNuGetPackages:
