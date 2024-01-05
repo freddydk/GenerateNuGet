@@ -29,7 +29,7 @@ on:
         required: false
         default: ''
       nuGetServerUrl:
-        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL variable)
+        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL or NUGETSERVERURL variable)
         required: false
         default: ''
   
