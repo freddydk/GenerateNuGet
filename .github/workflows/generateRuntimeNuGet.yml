@@ -55,7 +55,7 @@ jobs:
               $eventPath.inputs.psObject.Properties | Where-Object { @('Apps','Dependencies','NuGetToken') -contains $_.Name } | ForEach-Object {
                 $property = $_.Name
                 $value = $eventPath.inputs."$property"
-                Write-Host "--- ::add-mask::$value"
+                Write-Host "::add-mask::$value"
               }
             }
           }
