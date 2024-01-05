@@ -1,0 +1,112 @@
+name: Generate Runtime NuGet Packages
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+    inputs:
+      apps:
+        description: Comma separated list of apps to generate packages for
+        required: false
+        default: 'https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/BO-DK-main-Apps-2.0.200.0.zip'
+      dependencies:
+        description: Comma separated list of dependencies to publish before generating runtime packages
+        required: false
+        default: 'https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/Common-main-Apps-2.0.200.0.zip,https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/Misc-main-Apps-2.0.200.0.zip,https://github.com/BusinessCentralApps/buildorder/releases/download/2.0.200/BO-W1-main-Apps-2.0.200.0.zip'
+      country:
+        description: Country to generate packages for/with (default is w1)
+        required: false
+        default: 'dk'
+      additionalCountries:
+        description: Comma separated list of additional countries to generate packages for/with (leave empty for none)
+        required: false
+        default: ''
+      artifactVersion:
+        description: Business Central version to generate packages for/with (leave empty for default)
+        required: false
+        default: ''
+      artifactOnPrem:
+        description: Check this box to use on-prem Business Central artifacts
+        type: boolean
+        default: false
+      nuGetServerUrl:
+        description: NuGet server URL
+        required: false
+        default: 'https://pkgs.dev.azure.com/freddydk/apps/_packaging/MyRuntimePackages8/nuget/v3/index.json'
+
+jobs:
+  DetermineArtifacts:
+    name: Determine Business Central Artifacts
+    runs-on: [ ubuntu-latest ]
+    outputs:
+      artifactVersions: ${{ steps.determineArtifacts.outputs.ArtifactVersions }}
+      artifactVersionCount: ${{ steps.determineArtifacts.outputs.ArtifactVersionCount }}
+      runtimeDependencyPackageIds: ${{ steps.determineArtifacts.outputs.RuntimeDependencyPackageIds }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Determine Artifacts
+        id: determineArtifacts
+        shell: pwsh
+        env:
+          nuGetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
+          apps: ${{ github.event.inputs.apps }}
+          dependencies: ${{ github.event.inputs.dependencies }}
+          country: ${{ github.event.inputs.country }}
+          additionalCountries: ${{ github.event.inputs.additionalCountries }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion }}
+          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
+        run: |
+          Write-Host "apps: $env:apps"
+          . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
+
+  GenerateRuntimeNuGetPackages:
+    name: Runtime
+    needs: [ DetermineArtifacts ]
+    if: needs.DetermineArtifacts.outputs.artifactVersionCount > 0
+    runs-on: [ windows-latest ]
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.DetermineArtifacts.outputs.artifactVersions) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate Runtime NuGet Packages
+        shell: pwsh
+        env:
+          nuGetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
+          apps: ${{ github.event.inputs.apps }}
+          dependencies: ${{ github.event.inputs.dependencies }}
+          country: ${{ github.event.inputs.country }}
+          additionalCountries: ${{ github.event.inputs.additionalCountries }}
+          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
+          artifactVersion: ${{ matrix.artifactVersion }}
+          incompatibleArtifactVersion: ${{ matrix.incompatibleArtifactVersion }}
+          runtimeDependencyPackageIds: ${{ needs.DetermineArtifacts.outputs.runtimeDependencyPackageIds }}
+        run: |
+          . (Join-Path $env:GITHUB_WORKSPACE "GenerateRuntimeNuGetPackages.ps1")
+
+  GenerateIndirectNuGetPackage:
+    name: Generate Indirect NuGet Package
+    needs: [ DetermineArtifacts, GenerateRuntimeNuGetPackages ]
+    if: needs.DetermineArtifacts.outputs.artifactVersionCount > 0
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate Indirect NuGet Package
+        shell: pwsh
+        env:
+          nuGetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
+          apps: ${{ github.event.inputs.apps }}
+          dependencies: ${{ github.event.inputs.dependencies }}
+          country: ${{ github.event.inputs.country }}
+          additionalCountries: ${{ github.event.inputs.additionalCountries }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion }}
+          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
+        run: |
+          Write-Host "apps: $env:apps"
+          . (Join-Path $env:GITHUB_WORKSPACE "GenerateIndirectPackage.ps1")
