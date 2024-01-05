@@ -33,6 +33,9 @@ else {
     $artifactVersions = @(GetArtifactVersionsNeeded -apps $apps -allArtifactVersions $allArtifactVersions -runtimeDependencyPackageIds $runtimeDependencyPackageIds -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken)
 }
 
+# Temporarily limit to 2 versions
+$artifactVersions = @($artifactVersions | Select-Object -Last 5 | Select-Object -First 2)
+
 $artifactVersions = @($artifactVersions | ForEach-Object { @{ "artifactVersion" = "$_"; "incompatibleArtifactVersion" = "$($_.Major).$($_.Minor+1)" } })
 
 
