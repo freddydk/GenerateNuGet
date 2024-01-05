@@ -11,7 +11,7 @@ on:
       nuGetServerUrl:
         description: NuGet server URL
         required: false
-        default: '${{ vars.NuGetServerUrl }}'
+        default: ${{ vars.NuGetServerUrl }}
 
 jobs:
   GenerateNuGetPackages:
