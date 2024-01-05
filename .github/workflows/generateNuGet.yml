@@ -35,7 +35,7 @@ on:
       nuGetServerUrl:
         description: NuGet server URL
         required: false
-        default: 'https://pkgs.dev.azure.com/freddydk/apps/_packaging/MyRuntimePackages6/nuget/v3/index.json'
+        default: 'https://pkgs.dev.azure.com/freddydk/apps/_packaging/MyRuntimePackages7/nuget/v3/index.json'
 
 jobs:
   DetermineArtifacts:
