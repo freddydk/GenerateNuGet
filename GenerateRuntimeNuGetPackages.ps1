@@ -14,9 +14,11 @@ $dependencies = @(Copy-AppFilesToFolder -appFiles @("$env:dependencies".Split(',
 # Get parameters from workflow (and dependent job)
 $nuGetServerUrl = $env:nuGetServerUrl
 $nuGetToken = $env:nuGetToken
-$type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
 $country = $env:country
+if ($country -eq '') { $country = 'w1' }
 $additionalCountries = @("$env:additionalCountries".Split(',') | Where-Object { $_ -and $_ -ne $country })
+$artifactType = $env:artifactType
+if ($artifactType -eq '') { $artifactType = 'sandbox' }
 # Artifact version is from the matrix
 $artifactVersion = $env:artifactVersion
 $incompatibleArtifactVersion = $env:incompatibleArtifactVersion
@@ -24,7 +26,7 @@ $incompatibleArtifactVersion = $env:incompatibleArtifactVersion
 $runtimeDependencyPackageIds = $env:runtimedependencyPackageIds | ConvertFrom-Json | ConvertTo-HashTable
 
 # Create Runtime packages for main country and additional countries
-$runtimeAppFiles, $countrySpecificRuntimeAppFiles = GenerateRuntimeAppFiles -containerName $containerName -type $type -country $country -additionalCountries $additionalCountries -artifactVersion $artifactVersion -apps $apps -dependencies $dependencies
+$runtimeAppFiles, $countrySpecificRuntimeAppFiles = GenerateRuntimeAppFiles -containerName $containerName -type $artifactType -country $country -additionalCountries $additionalCountries -artifactVersion $artifactVersion -apps $apps -dependencies $dependencies
 
 # For every app create and push nuGet package (unless the exact version already exists)
 foreach($appFile in $apps) {

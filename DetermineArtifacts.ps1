@@ -9,11 +9,11 @@ $apps = @(Copy-AppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $app
 # Get workflow input
 $nuGetServerUrl = $env:nuGetServerUrl
 $nuGetToken = $env:nuGetToken
-$type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
 $country = $env:country
+if ($country -eq '') { $country = 'w1' }
+$artifactType = $env:artifactType
+if ($artifactType -eq '') { $artifactType = 'sandbox' }
 $artifactVersion = $env:artifactVersion
-
-
 
 # Find the highest application dependency for the apps in order to determine which BC Application version to use for runtime packages
 $highestApplicationDependency = GetHighestApplicationDependency -apps $apps
@@ -22,7 +22,7 @@ $highestApplicationDependency = GetHighestApplicationDependency -apps $apps
 $runtimeDependencyPackageIds, $newPackage = GetRuntimeDependencyPackageIds -apps $apps
 
 # Determine which artifacts are needed for any of the apps
-$allArtifactVersions = @(GetArtifactVersionsSince -type $type -country $country -version "$highestApplicationDependency")
+$allArtifactVersions = @(GetArtifactVersionsSince -type $artifactType -country $country -version "$highestApplicationDependency")
 
 if ($newPackage) {
     # If a new package is to be created, all artifacts are needed
@@ -37,8 +37,6 @@ else {
 $artifactVersions = @($artifactVersions | Select-Object -Last 5 | Select-Object -First 2)
 
 $artifactVersions = @($artifactVersions | ForEach-Object { @{ "artifactVersion" = "$_"; "incompatibleArtifactVersion" = "$($_.Major).$($_.Minor+1)" } })
-
-
 
 Write-Host "Artifact versions:"
 $artifactVersions | ForEach-Object { Write-Host "- $_" }

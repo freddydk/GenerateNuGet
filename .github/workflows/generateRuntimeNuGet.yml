@@ -24,10 +24,10 @@ on:
         description: Business Central artifacts version (leave empty to use ARTIFACTVERSION variable, default is to auto-calculate needed artifacts)
         required: false
         default: ''
-      artifactOnPrem:
-        description: Check this box to use on-prem Business Central artifacts
-        type: boolean
-        default: false
+      artifactType:
+        description: Type of Business Central artifacts to use, onprem or sandbox (leave empty to use ARTIFACTTYPE variable, default is sandbox)
+        required: false
+        default: ''
       nuGetServerUrl:
         description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL variable)
         required: false
@@ -55,7 +55,7 @@ jobs:
           country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
           additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
           artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
-          artifactOnPrem: '${{ github.event.inputs.artifactOnPrem != '' && github.event.inputs.artifactOnPrem || vars.ARTIFACTONPREM }}'
+          artifactType: '${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}'
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
@@ -81,7 +81,7 @@ jobs:
           country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
           additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
           artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
-          artifactOnPrem: '${{ github.event.inputs.artifactOnPrem != '' && github.event.inputs.artifactOnPrem || vars.ARTIFACTONPREM }}'
+          artifactType: '${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}'
           incompatibleArtifactVersion: ${{ matrix.incompatibleArtifactVersion }}
           runtimeDependencyPackageIds: ${{ needs.DetermineArtifacts.outputs.runtimeDependencyPackageIds }}
         run: |
@@ -105,6 +105,6 @@ jobs:
           country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
           additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
           artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
-          artifactOnPrem: '${{ github.event.inputs.artifactOnPrem != '' && github.event.inputs.artifactOnPrem || vars.ARTIFACTONPREM }}'
+          artifactType: '${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}'
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateIndirectPackage.ps1")
