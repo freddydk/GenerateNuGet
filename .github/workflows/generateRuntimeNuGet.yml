@@ -49,13 +49,13 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: '${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}'
-          apps: '${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}'
-          dependencies: '${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}'
-          country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
-          additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
-          artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
-          artifactType: '${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}'
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
+          dependencies: ${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}
+          country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
+          additionalCountries: ${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}
+          artifactType: ${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
@@ -75,13 +75,13 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: '${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}'
-          apps: '${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}'
-          dependencies: '${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}'
-          country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
-          additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
-          artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
-          artifactType: '${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}'
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
+          dependencies: ${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}
+          country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
+          additionalCountries: ${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}
+          artifactType: ${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}
           incompatibleArtifactVersion: ${{ matrix.incompatibleArtifactVersion }}
           runtimeDependencyPackageIds: ${{ needs.DetermineArtifacts.outputs.runtimeDependencyPackageIds }}
         run: |
@@ -99,12 +99,12 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: '${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}'
-          apps: '${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}'
-          dependencies: '${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}'
-          country: '${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}'
-          additionalCountries: '${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}'
-          artifactVersion: '${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}'
-          artifactType: '${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}'
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
+          dependencies: ${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}
+          country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
+          additionalCountries: ${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}
+          artifactVersion: ${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}
+          artifactType: ${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateIndirectPackage.ps1")
