@@ -5,10 +5,10 @@ Write-Host "Generate Runtime NuGet Packages"
 $env:runtimedependencyPackageIds | Out-Host
 
 $appsFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
-$apps = @(CopyAppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
+$apps = @(Copy-AppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
 
 $dependenciesFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
-$dependencies = @(CopyAppFilesToFolder -appFiles @("$env:dependencies".Split(',')) -folder $dependenciesFolder)
+$dependencies = @(Copy-AppFilesToFolder -appFiles @("$env:dependencies".Split(',')) -folder $dependenciesFolder)
 
 $type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
 $artifactVersion = $env:artifactVersion

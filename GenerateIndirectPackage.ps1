@@ -3,7 +3,7 @@ Write-Host "Determine Artifacts"
 . (Join-Path $PSScriptRoot "HelperFunctions.ps1")
 
 $appsFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
-$apps = @(CopyAppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
+$apps = @(Copy-AppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
 
 $type = @("sandbox","onprem")[$env:artifactOnPrem -eq 'true']
 $artifactVersion = $env:artifactVersion
