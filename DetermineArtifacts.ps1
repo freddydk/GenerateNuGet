@@ -39,7 +39,7 @@ $artifactVersions = @($artifactVersions | Select-Object -Last 5 | Select-Object 
 $artifactVersions = @($artifactVersions | ForEach-Object { @{ "artifactVersion" = "$_"; "incompatibleArtifactVersion" = "$($_.Major).$($_.Minor+1)" } })
 
 Write-Host "Artifact versions:"
-$artifactVersions | ForEach-Object { Write-Host "- $_" }
+$artifactVersions | ForEach-Object { Write-Host "- $(ConvertTo-Json -InputObject $_ -Compress)" }
 Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactVersions=$(ConvertTo-Json -InputObject @($artifactVersions) -Compress)" -Encoding UTF8
 Add-Content -Path $ENV:GITHUB_OUTPUT -Value "ArtifactVersionCount=$($artifactVersions.Count)" -Encoding UTF8
 
