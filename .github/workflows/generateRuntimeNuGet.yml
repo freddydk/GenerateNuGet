@@ -32,10 +32,6 @@ on:
         description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL variable)
         required: false
         default: ''
-      nuGetToken:
-        description: NuGet token (leave empty to use RUNTIMENUGETTOKEN secret)
-        required: false
-        default: ''
   
 jobs:
   DetermineArtifacts:
@@ -52,14 +48,13 @@ jobs:
         id: determineArtifacts
         shell: pwsh
         env:
-          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.RUNTIMENUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.RUNTIMENUGETSERVERURL }}
+          nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (vars.RUNTIMENUGETSERVERURL != '' && vars.RUNTIMENUGETSERVERURL || vars.NUGETSERVERURL) }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
           country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
           artifactVersion: ${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}
           artifactType: ${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}
         run: |
-          Write-Host "::add-mask::$env:nuGetToken"
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
   GenerateRuntimeNuGetPackages:
@@ -77,8 +72,8 @@ jobs:
       - name: Generate Runtime NuGet Packages
         shell: pwsh
         env:
-          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.RUNTIMENUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.RUNTIMENUGETSERVERURL }}
+          nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (vars.RUNTIMENUGETSERVERURL != '' && vars.RUNTIMENUGETSERVERURL || vars.NUGETSERVERURL) }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
           dependencies: ${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}
           country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
@@ -101,8 +96,8 @@ jobs:
       - name: Generate Indirect NuGet Package
         shell: pwsh
         env:
-          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.RUNTIMENUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.RUNTIMENUGETSERVERURL }}
+          nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (vars.RUNTIMENUGETSERVERURL != '' && vars.RUNTIMENUGETSERVERURL || vars.NUGETSERVERURL) }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateIndirectPackage.ps1")

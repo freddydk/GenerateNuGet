@@ -12,10 +12,6 @@ on:
         description: NuGet server URL (leave empty to use NUGETSERVERURL variable)
         required: false
         default: ''
-      nuGetToken:
-        description: NuGet token (leave empty to use NUGETTOKEN secret)
-        required: false
-        default: ''
 
 jobs:
   GenerateNuGetPackages:
@@ -27,9 +23,8 @@ jobs:
       - name: Generate NuGet Packages
         shell: pwsh
         env:
-          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.NUGETTOKEN }}
+          nuGetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
         run: |
-          Write-Host "::add-mask::$env:nuGetToken"
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateNuGetPackages.ps1")
