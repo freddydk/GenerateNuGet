@@ -32,6 +32,10 @@ on:
         description: Check this box to use on-prem Business Central artifacts
         type: boolean
         default: false
+      nuGetServerUrl:
+        description: NuGet server URL
+        required: false
+        default: 'https://pkgs.dev.azure.com/freddydk/apps/_packaging/MyRuntimePackages6/nuget/v3/index.json'
 
 jobs:
   DetermineArtifacts:
@@ -49,7 +53,7 @@ jobs:
         shell: pwsh
         env:
           nugetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
           dependencies: ${{ github.event.inputs.dependencies }}
           country: ${{ github.event.inputs.country }}
@@ -76,7 +80,7 @@ jobs:
         shell: pwsh
         env:
           nugetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
           dependencies: ${{ github.event.inputs.dependencies }}
           country: ${{ github.event.inputs.country }}
@@ -99,7 +103,7 @@ jobs:
         shell: pwsh
         env:
           nugetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
           dependencies: ${{ github.event.inputs.dependencies }}
           country: ${{ github.event.inputs.country }}
@@ -122,7 +126,7 @@ jobs:
         shell: pwsh
         env:
           nugetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ secrets.NUGETSERVERURL }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
           dependencies: ${{ github.event.inputs.dependencies }}
           country: ${{ github.event.inputs.country }}
