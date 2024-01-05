@@ -5,19 +5,19 @@ on:
   workflow_dispatch:
     inputs:
       apps:
-        description: Comma separated list of apps to generate packages for (leave empty to use APPS variable)
+        description: Comma separated list of apps (leave empty to use APPS variable)
         required: false
         default: ''
       dependencies:
-        description: Comma separated list of dependencies to publish before generating runtime packages (leave empty to use DEPENDENCIES variable)
+        description: Comma separated list of dependencies (leave empty to use DEPENDENCIES variable)
         required: false
         default: ''
       country:
-        description: Country for the main runtime version in the NuGet package (leave empty to use COUNTRY variable, default is w1)
+        description: Country for the main runtime version (leave empty to use COUNTRY variable, default is w1)
         required: false
         default: ''
       additionalCountries:
-        description: Comma separated list of additional countries to include in the NuGet package (leave empty to use ADDITIONALCOUNTRIES variable, default is none)
+        description: Comma separated list of additional countries (leave empty to use ADDITIONALCOUNTRIES variable, default is none)
         required: false
         default: ''
       artifactVersion:
