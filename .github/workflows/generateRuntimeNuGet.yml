@@ -5,11 +5,11 @@ on:
   workflow_dispatch:
     inputs:
       apps:
-        description: Comma separated list of apps (leave empty to use APPS variable)
+        description: Comma separated list of apps (leave empty to use APPS secret)
         required: false
         default: ''
       dependencies:
-        description: Comma separated list of dependencies (leave empty to use DEPENDENCIES variable)
+        description: Comma separated list of dependencies (leave empty to use DEPENDENCIES secret)
         required: false
         default: ''
       country:
@@ -29,7 +29,7 @@ on:
         required: false
         default: ''
       nuGetServerUrl:
-        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL or NUGETSERVERURL variable)
+        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL or NUGETSERVERURL secret)
         required: false
         default: ''
   
@@ -42,15 +42,21 @@ jobs:
       artifactVersionCount: ${{ steps.determineArtifacts.outputs.ArtifactVersionCount }}
       runtimeDependencyPackageIds: ${{ steps.determineArtifacts.outputs.RuntimeDependencyPackageIds }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Mask input
+        shell: pwsh
+        run: |
+          . (Join-Path $env:GITHUB_WORKSPACE "MaskInput.ps1")
+        
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Determine Artifacts
         id: determineArtifacts
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (vars.RUNTIMENUGETSERVERURL != '' && vars.RUNTIMENUGETSERVERURL || vars.NUGETSERVERURL) }}
-          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (secrets.RUNTIMENUGETSERVERURL != '' && secrets.RUNTIMENUGETSERVERURL || secrets.NUGETSERVERURL) }}
+          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
           country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
           artifactVersion: ${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}
           artifactType: ${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}
@@ -67,15 +73,16 @@ jobs:
         include: ${{ fromJson(needs.DetermineArtifacts.outputs.artifactVersions) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Generate Runtime NuGet Packages
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (vars.RUNTIMENUGETSERVERURL != '' && vars.RUNTIMENUGETSERVERURL || vars.NUGETSERVERURL) }}
-          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
-          dependencies: ${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (secrets.RUNTIMENUGETSERVERURL != '' && secrets.RUNTIMENUGETSERVERURL || secrets.NUGETSERVERURL) }}
+          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
+          dependencies: ${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || secrets.DEPENDENCIES }}
           country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
           additionalCountries: ${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}
           artifactType: ${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}
@@ -91,13 +98,14 @@ jobs:
     if: needs.DetermineArtifacts.outputs.artifactVersionCount > 0
     runs-on: [ ubuntu-latest ]
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Generate Indirect NuGet Package
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (vars.RUNTIMENUGETSERVERURL != '' && vars.RUNTIMENUGETSERVERURL || vars.NUGETSERVERURL) }}
-          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (secrets.RUNTIMENUGETSERVERURL != '' && secrets.RUNTIMENUGETSERVERURL || secrets.NUGETSERVERURL) }}
+          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateIndirectPackage.ps1")

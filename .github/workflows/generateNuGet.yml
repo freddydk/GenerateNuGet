@@ -5,11 +5,11 @@ on:
   workflow_dispatch:
     inputs:
       apps:
-        description: Comma separated list of apps (leave empty to use APPS variable)
+        description: Comma separated list of apps (leave empty to use APPS secrets)
         required: false
         default: ''
       nuGetServerUrl:
-        description: NuGet server URL (leave empty to use NUGETSERVERURL variable)
+        description: NuGet server URL (leave empty to use NUGETSERVERURL secrets)
         required: false
         default: ''
 
@@ -18,13 +18,19 @@ jobs:
     name: Generate NuGet Packages
     runs-on: [ ubuntu-latest ]
     steps:
-      - uses: actions/checkout@v3
+      - name: Mask input
+        shell: pwsh
+        run: |
+          . (Join-Path $env:GITHUB_WORKSPACE "MaskInput.ps1")
+        
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Generate NuGet Packages
         shell: pwsh
         env:
           nuGetToken: ${{ secrets.NUGETTOKEN }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.NUGETSERVERURL }}
-          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || secrets.NUGETSERVERURL }}
+          apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateNuGetPackages.ps1")
