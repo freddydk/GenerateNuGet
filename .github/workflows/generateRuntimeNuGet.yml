@@ -32,7 +32,11 @@ on:
         description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL variable)
         required: false
         default: ''
-
+      nuGetToken:
+        description: NuGet token (leave empty to use RUNTIMENUGETTOKEN secret)
+        required: false
+        default: ''
+  
 jobs:
   DetermineArtifacts:
     name: Determine Business Central Artifacts
@@ -48,7 +52,7 @@ jobs:
         id: determineArtifacts
         shell: pwsh
         env:
-          nuGetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.RUNTIMENUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.RUNTIMENUGETSERVERURL }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
           country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
@@ -72,7 +76,7 @@ jobs:
       - name: Generate Runtime NuGet Packages
         shell: pwsh
         env:
-          nuGetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.RUNTIMENUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.RUNTIMENUGETSERVERURL }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
           dependencies: ${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || vars.DEPENDENCIES }}
@@ -96,7 +100,7 @@ jobs:
       - name: Generate Indirect NuGet Package
         shell: pwsh
         env:
-          nuGetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.RUNTIMENUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.RUNTIMENUGETSERVERURL }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || vars.APPS }}
         run: |
