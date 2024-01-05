@@ -16,7 +16,7 @@ $artifactVersion = $env:artifactVersion
 $nugetServerUrl = $env:nugetServerUrl
 $nugetToken = $env:nugetToken
 $country = $env:country
-$additionalCountries = @("$env:additionalCountries".Split(','))
+$additionalCountries = @("$env:additionalCountries".Split(',') | Where-Object { $_ -and $_ -ne $country })
 $runtimeDependencyPackageIds = $env:runtimedependencyPackageIds | ConvertFrom-Json
 
 $artifacturl = Get-BCArtifactUrl -type $type -country $country -version $artifactVersion -select Closest

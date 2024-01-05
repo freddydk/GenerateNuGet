@@ -65,7 +65,7 @@ jobs:
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
   GenerateRuntimeNuGetPackages:
-    name: BC Runtime
+    name: Runtime
     if: github.event.inputs.runtime == 'true'
     needs: [ DetermineArtifacts ]
     runs-on: [ windows-latest ]
@@ -128,10 +128,5 @@ jobs:
           nugetToken: ${{ secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl }}
           apps: ${{ github.event.inputs.apps }}
-          dependencies: ${{ github.event.inputs.dependencies }}
-          country: ${{ github.event.inputs.country }}
-          additionalCountries: ${{ github.event.inputs.additionalCountries }}
-          artifactVersion: ${{ github.event.inputs.artifactVersion }}
-          artifactOnPrem: ${{ github.event.inputs.artifactOnPrem }}
         run: |
           . (Join-Path $env:GITHUB_WORKSPACE "GenerateNuGetPackages.ps1")

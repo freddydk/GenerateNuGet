@@ -10,7 +10,6 @@ $artifactVersion = $env:artifactVersion
 $nugetServerUrl = $env:nugetServerUrl
 $nugetToken = $env:nugetToken
 $country = $env:country
-$additionalCountries = @("$env:additionalCountries".Split(','))
 
 # Determine BC artifacts needed for building missing runtime packages
 # Find the highest application dependency for the apps in order to determine which BC Application version to use for runtime packages
