@@ -110,19 +110,19 @@ function GetArtifactVersionsSince {
 function GetArtifactVersionsNeeded {
     Param(
         [string[]] $apps,
-        [System.Version[]] $artifactVersions,
+        [System.Version[]] $allArtifactVersions,
         [hashtable] $runtimeDependencyPackageIds,
         [string] $nuGetServerUrl,
         [string] $nuGetToken
     )
 
     # Look for latest artifacts first
-    [Array]::Reverse($artifactVersions)
+    [Array]::Reverse($allArtifactVersions)
     # Search for runtime nuGet packages for all apps
     $artifactsNeeded = @()
     foreach($appFile in $apps) {
         $appName = [System.IO.Path]::GetFileName($appFile)
-        foreach($artifactVersion in $artifactVersions) {
+        foreach($artifactVersion in $allArtifactVersions) {
             $runtimeDependencyPackageId = $runtimeDependencyPackageIds."$appName"    
             $package = Get-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -packageName $runtimeDependencyPackageId -version "$artifactVersion" -select Exact
             if ($package) {

@@ -30,7 +30,7 @@ if ($newPackage) {
 }
 else {
     # all indirect packages exists - determine which runtime package versions doesn't exist for the app
-    $artifactVersions = @(GetArtifactVersionsNeeded -apps $apps -artifactVersions $artifactVersions -runtimeDependencyPackageIds $runtimeDependencyPackageIds -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken)
+    $artifactVersions = @(GetArtifactVersionsNeeded -apps $apps -allArtifactVersions $allArtifactVersions -runtimeDependencyPackageIds $runtimeDependencyPackageIds -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken)
 }
 
 $artifactVersions = @($artifactVersions | ForEach-Object { @{ "artifactVersion" = "$_"; "incompatibleArtifactVersion" = "$($_.Major).$($_.Minor+1)" } })
