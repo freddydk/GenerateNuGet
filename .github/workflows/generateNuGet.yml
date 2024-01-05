@@ -5,11 +5,15 @@ on:
   workflow_dispatch:
     inputs:
       apps:
-        description: Comma separated list of apps (leave empty to use APPS secrets)
+        description: Comma separated list of apps (leave empty to use APPS secret)
         required: false
         default: ''
       nuGetServerUrl:
-        description: NuGet server URL (leave empty to use NUGETSERVERURL secrets)
+        description: NuGet server URL (leave empty to use NUGETSERVERURL secret)
+        required: false
+        default: ''
+      nuGetToken:
+        description: NuGet auth token (leave empty to use NUGETTOKEN secret)
         required: false
         default: ''
 
@@ -27,7 +31,7 @@ jobs:
               $eventPath.inputs.psObject.Properties | Where-Object { @('Apps','Dependencies','NuGetServerUrl','NuGetToken') -contains $_.Name } | ForEach-Object {
                 $property = $_.Name
                 $value = $eventPath.inputs."$property"
-                Write-Host "--- ::add-mask::$value"
+                Write-Host "::add-mask::$value"
               }
             }
           }
@@ -38,7 +42,7 @@ jobs:
       - name: Generate NuGet Packages
         shell: pwsh
         env:
-          nuGetToken: ${{ secrets.NUGETTOKEN }}
+          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || secrets.NUGETTOKEN }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || secrets.NUGETSERVERURL }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
         run: |

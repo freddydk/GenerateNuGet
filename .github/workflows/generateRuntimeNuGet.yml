@@ -32,7 +32,11 @@ on:
         description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL or NUGETSERVERURL secret)
         required: false
         default: ''
-  
+      nuGetToken:
+        description: NuGet auth token (leave empty to use RUNTIMENUGETTOKEN or NUGETTOKEN secret)
+        required: false
+        default: ''
+
 jobs:
   DetermineArtifacts:
     name: Determine Business Central Artifacts
@@ -63,7 +67,7 @@ jobs:
         id: determineArtifacts
         shell: pwsh
         env:
-          nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
+          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || (secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN) }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (secrets.RUNTIMENUGETSERVERURL != '' && secrets.RUNTIMENUGETSERVERURL || secrets.NUGETSERVERURL) }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
           country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
@@ -88,7 +92,7 @@ jobs:
       - name: Generate Runtime NuGet Packages
         shell: pwsh
         env:
-          nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
+          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || (secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN) }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (secrets.RUNTIMENUGETSERVERURL != '' && secrets.RUNTIMENUGETSERVERURL || secrets.NUGETSERVERURL) }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
           dependencies: ${{ github.event.inputs.dependencies != '' && github.event.inputs.dependencies || secrets.DEPENDENCIES }}
@@ -113,7 +117,7 @@ jobs:
       - name: Generate Indirect NuGet Package
         shell: pwsh
         env:
-          nuGetToken: ${{ secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN }}
+          nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || (secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN) }}
           nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (secrets.RUNTIMENUGETSERVERURL != '' && secrets.RUNTIMENUGETSERVERURL || secrets.NUGETSERVERURL) }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
         run: |
