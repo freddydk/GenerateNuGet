@@ -37,7 +37,14 @@ if ($artifactVersion -eq '' -or $artifactVersion.EndsWith('-')) {
     }
 }
 else {
-    $artifactVersions = @($artifactVersion.Split(',') | ForEach-Object { [System.Version]"$(NormalizeVersionStr -versionStr $_)" })
+    $artifactVersions = @($artifactVersion.Split(',') | ForEach-Object {
+        $version = NormalizeVersionStr -versionStr $_
+        $artifactUrl = Get-BCArtifactUrl -type $artifactType -country $country -version $version -select Closest
+        if (-not $artifactUrl) {
+            throw "Cannot find artifact for $_"
+        }
+        [System.Version]($artifactUrl.Split('/')[4])
+    })
 }
 
 $artifactVersions = @($artifactVersions | ForEach-Object { @{ "artifactVersion" = "$_"; "incompatibleArtifactVersion" = "$($_.Major).$($_.Minor+1)" } })
