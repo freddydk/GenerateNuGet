@@ -59,8 +59,8 @@ function NormalizeVersionStr {
         [string] $versionStr
     )
     $version = [System.version]$versionStr
+    if ($version.Build -eq -1) { $version = [System.Version]::new($version.Major, $version.Minor, 0, 0) }
     if ($version.Revision -eq -1) { $version = [System.Version]::new($version.Major, $version.Minor, $version.Build, 0) }
-    if ($version.Build -eq -1) { $version = [System.Version]::new($version.Major, $version.Minor, 0, $version.Revision) }
     return "$version"
 }
 

@@ -37,7 +37,7 @@ if ($artifactVersion -eq '' -or $artifactVersion.EndsWith('-')) {
     }
 }
 else {
-    $artifactVersions = @($artifactVersion.Split(',') | ForEach-Object { [System.Version](NormalizeVersionStr($_)) })
+    $artifactVersions = @($artifactVersion.Split(',') | ForEach-Object { [System.Version]"$(NormalizeVersionStr -versionStr $_)" })
 }
 
 $artifactVersions = @($artifactVersions | ForEach-Object { @{ "artifactVersion" = "$_"; "incompatibleArtifactVersion" = "$($_.Major).$($_.Minor+1)" } })
