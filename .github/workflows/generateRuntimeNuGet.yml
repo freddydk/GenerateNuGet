@@ -68,7 +68,6 @@ jobs:
           . (Join-Path $env:GITHUB_WORKSPACE "DetermineArtifacts.ps1")
 
   GenerateRuntimeNuGetPackages:
-    name: Runtime
     needs: [ DetermineArtifacts ]
     if: needs.DetermineArtifacts.outputs.artifactVersionCount > 0
     runs-on: [ windows-latest ]
@@ -76,6 +75,7 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.DetermineArtifacts.outputs.artifactVersions) }}
       fail-fast: false
+    name: Runtime ${{ matrix.artifactVersion }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
