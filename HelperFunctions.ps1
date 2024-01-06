@@ -54,12 +54,24 @@ function GetRuntimeDependencyPackageIds {
     return $runtimeDependencyPackageIds, $newPackage
 }
 
+function NormalizeVersionStr {
+    Param(
+        [string] $versionStr
+    )
+    $version = [System.version]$versionStr
+    if ($version.Revision -eq -1) { $version = [System.Version]::new($version.Major, $version.Minor, $version.Build, 0) }
+    if ($version.Build -eq -1) { $version = [System.Version]::new($version.Major, $version.Minor, 0, $version.Revision) }
+    return "$version"
+}
+
 # Find the highest application dependency for the apps in order to determine which BC Application version to use for runtime packages
 function GetHighestApplicationDependency {
     Param(
-        [string[]] $apps
+        [string[]] $apps,
+        [string] $lowestVersion
     )
-    $highestApplicationDependency = '1.0.0.0'
+    if (-not $lowestVersion) { $lowestVersion = '1.0' }
+    $highestApplicationDependency = NormalizeVersionStr($lowestVersion)
     foreach($appFile in $apps) {
         $appJson = Get-AppJsonFromAppFile -appFile $appFile
         # Determine Application Dependency for this app

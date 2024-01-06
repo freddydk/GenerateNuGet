@@ -13,24 +13,31 @@ $country = $env:country
 if ($country -eq '') { $country = 'w1' }
 $artifactType = $env:artifactType
 if ($artifactType -eq '') { $artifactType = 'sandbox' }
-$artifactVersion = $env:artifactVersion
+$artifactVersion = "$env:artifactVersion".Trim()
 
-# Find the highest application dependency for the apps in order to determine which BC Application version to use for runtime packages
-$highestApplicationDependency = GetHighestApplicationDependency -apps $apps
+# If artifact Version is empty or it is a starting version (like 20.0-) then determine which artifact versions are needed
+if ($artifactVersion -eq '' -or $artifactVersion.EndsWith('-')) {
 
-# Determine runtime dependency package ids for all apps and whether any of the apps doesn't exist as a nuGet package
-$runtimeDependencyPackageIds, $newPackage = GetRuntimeDependencyPackageIds -apps $apps
+    # Find the highest application dependency for the apps in order to determine which BC Application version to use for runtime packages
+    $highestApplicationDependency = GetHighestApplicationDependency -apps $apps -lowestVersion ($artifactVersion.Split('-')[0])
 
-# Determine which artifacts are needed for any of the apps
-$allArtifactVersions = @(GetArtifactVersionsSince -type $artifactType -country $country -version "$highestApplicationDependency")
+    # Determine runtime dependency package ids for all apps and whether any of the apps doesn't exist as a nuGet package
+    $runtimeDependencyPackageIds, $newPackage = GetRuntimeDependencyPackageIds -apps $apps
 
-if ($newPackage) {
-    # If a new package is to be created, all artifacts are needed
-    $artifactVersions = $allArtifactVersions
+    # Determine which artifacts are needed for any of the apps
+    $allArtifactVersions = @(GetArtifactVersionsSince -type $artifactType -country $country -version "$highestApplicationDependency")
+
+    if ($newPackage) {
+        # If a new package is to be created, all artifacts are needed
+        $artifactVersions = $allArtifactVersions
+    }
+    else {
+        # all indirect packages exists - determine which runtime package versions doesn't exist for the app
+        $artifactVersions = @(GetArtifactVersionsNeeded -apps $apps -allArtifactVersions $allArtifactVersions -runtimeDependencyPackageIds $runtimeDependencyPackageIds -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken)
+    }
 }
 else {
-    # all indirect packages exists - determine which runtime package versions doesn't exist for the app
-    $artifactVersions = @(GetArtifactVersionsNeeded -apps $apps -allArtifactVersions $allArtifactVersions -runtimeDependencyPackageIds $runtimeDependencyPackageIds -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken)
+    $artifactVersions = @($artifactVersion.Split(',') | ForEach-Object { [System.Version](NormalizeVersionStr($_)) })
 }
 
 $artifactVersions = @($artifactVersions | ForEach-Object { @{ "artifactVersion" = "$_"; "incompatibleArtifactVersion" = "$($_.Major).$($_.Minor+1)" } })

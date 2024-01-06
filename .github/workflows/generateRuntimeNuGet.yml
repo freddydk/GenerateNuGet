@@ -29,7 +29,7 @@ on:
         required: false
         default: ''
       artifactVersion:
-        description: Business Central artifacts version (leave empty to use ARTIFACTVERSION variable, default is to auto-calculate needed artifacts)
+        description: Business Central artifacts version range (leave empty to use ARTIFACTVERSION variable, default is to auto-calculate needed artifacts)
         required: false
         default: ''
       artifactType:
