@@ -15,14 +15,14 @@ $artifactType = $env:artifactType
 if ($artifactType -eq '') { $artifactType = 'sandbox' }
 $artifactVersion = "$env:artifactVersion".Trim()
 
+# Determine runtime dependency package ids for all apps and whether any of the apps doesn't exist as a nuGet package
+$runtimeDependencyPackageIds, $newPackage = GetRuntimeDependencyPackageIds -apps $apps
+
 # If artifact Version is empty or it is a starting version (like 20.0-) then determine which artifact versions are needed
 if ($artifactVersion -eq '' -or $artifactVersion.EndsWith('-')) {
 
     # Find the highest application dependency for the apps in order to determine which BC Application version to use for runtime packages
     $highestApplicationDependency = GetHighestApplicationDependency -apps $apps -lowestVersion ($artifactVersion.Split('-')[0])
-
-    # Determine runtime dependency package ids for all apps and whether any of the apps doesn't exist as a nuGet package
-    $runtimeDependencyPackageIds, $newPackage = GetRuntimeDependencyPackageIds -apps $apps
 
     # Determine which artifacts are needed for any of the apps
     $allArtifactVersions = @(GetArtifactVersionsSince -type $artifactType -country $country -version "$highestApplicationDependency")
