@@ -5,9 +5,6 @@ if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
       $property = $_.Name
       $value = $eventPath.inputs."$property"
       Write-Host "::add-mask::$value"
-      $value.Split(',') | ForEach-Object {
-        Write-Host "::add-mask::$($_.Trim())"
-      }
     }
   }
 }
