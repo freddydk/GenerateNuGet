@@ -5,7 +5,7 @@ Write-Host "Generate Indirect NuGet Package"
 $appsFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString())
 $apps = @(Copy-AppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
 
-$nuGetServerUrl = $env:nuGetServerUrl
+$nuGetServerUrl, $githubRepository = GetNuGetServerUrlAndRepository -nuGetServerUrl $env:nuGetServerUrl
 $nuGetToken = $env:nuGetToken
 
 foreach($appFile in $apps) {
@@ -15,7 +15,7 @@ foreach($appFile in $apps) {
     $package = Get-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -packageName $appJson.id -version $appJson.version -select Exact
     if (-not $package) {
         # If just one of the apps doesn't exist as a nuGet package, we need to create a new indirect nuGet package and build all runtime versions of the nuGet
-        $package = New-BcNuGetPackage -appfile $appFile -isIndirectPackage -runtimeDependencyId '{publisher}.{name}.runtime-{version}'
+        $package = New-BcNuGetPackage -appfile $appFile -githubRepository $githubRepository -isIndirectPackage -runtimeDependencyId '{publisher}.{name}.runtime-{version}'
         Push-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -bcNuGetPackage $package
     }
 }

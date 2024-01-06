@@ -33,7 +33,9 @@ function GetRuntimeDependencyPackageId {
 
 function GetRuntimeDependencyPackageIds {
     Param(
-        [string[]] $apps
+        [string[]] $apps,
+        [string] $nuGetServerUrl,
+        [string] $nuGetToken
     )
     $runtimeDependencyPackageIds = @{}
     $newPackage = $false
@@ -49,11 +51,27 @@ function GetRuntimeDependencyPackageIds {
             $newPackage = $true
         }
         $runTimeDependencyPackageId = GetRuntimeDependencyPackageId -package $package
+        if ($newPackage) {
+            Remove-Item -Path $package -Recurse -Force
+        }
         $runtimeDependencyPackageIds += @{ $appName = $runTimeDependencyPackageId }
     }
     return $runtimeDependencyPackageIds, $newPackage
 }
 
+function GetNuGetServerUrlAndRepository {
+    Param(
+        [string] $nuGetServerUrl
+    )
+    if ($nugetServerUrl -match '^https:\/\/github\.com\/([^\/]+)\/([^\/]+)$') {
+        $githubRepository = $nuGetServerUrl
+        $nuGetServerUrl = "https://nuget.pkg.github.com/$($Matches[1])/index.json"
+    }
+    else {
+        $githubRepository = ''
+    }
+    return $nuGetServerUrl, $githubRepository
+}
 function NormalizeVersionStr {
     Param(
         [string] $versionStr

@@ -12,7 +12,7 @@ $dependenciesFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGu
 $dependencies = @(Copy-AppFilesToFolder -appFiles @("$env:dependencies".Split(',')) -folder $dependenciesFolder)
 
 # Get parameters from workflow (and dependent job)
-$nuGetServerUrl = $env:nuGetServerUrl
+$nuGetServerUrl, $githubRepository = GetNuGetServerUrlAndRepository -nuGetServerUrl $env:nuGetServerUrl
 $nuGetToken = $env:nuGetToken
 $country = $env:country
 if ($country -eq '') { $country = 'w1' }
@@ -39,7 +39,7 @@ foreach($appFile in $apps) {
     $runtimeDependencyPackageId = $runtimeDependencyPackageIds."$appName"    
     $package = Get-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -packageName $runtimeDependencyPackageId -version $artifactVersion -select Exact
     if (-not $package) {
-        $runtimePackage = New-BcNuGetPackage -appfile $runtimeAppFiles."$appName" -countrySpecificAppFiles $countrySpecificRuntimeAppFiles."$appName" -packageId $runtimeDependencyPackageId -packageVersion $artifactVersion -applicationDependency "[$artifactVersion,$incompatibleArtifactVersion)"
+        $runtimePackage = New-BcNuGetPackage -appfile $runtimeAppFiles."$appName" -countrySpecificAppFiles $countrySpecificRuntimeAppFiles."$appName" -packageId $runtimeDependencyPackageId -packageVersion $artifactVersion -applicationDependency "[$artifactVersion,$incompatibleArtifactVersion)" -githubRepository $githubRepository
         Push-BcNuGetPackage -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken -bcNuGetPackage $runtimePackage
     }
 }

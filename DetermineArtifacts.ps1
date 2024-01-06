@@ -7,7 +7,7 @@ $appsFolder = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToS
 $apps = @(Copy-AppFilesToFolder -appFiles @("$env:apps".Split(',')) -folder $appsFolder)
 
 # Get workflow input
-$nuGetServerUrl = $env:nuGetServerUrl
+$nuGetServerUrl, $githubRepository = GetNuGetServerUrlAndRepository -nuGetServerUrl $env:nuGetServerUrl
 $nuGetToken = $env:nuGetToken
 $country = $env:country
 if ($country -eq '') { $country = 'w1' }
@@ -16,7 +16,7 @@ if ($artifactType -eq '') { $artifactType = 'sandbox' }
 $artifactVersion = "$env:artifactVersion".Trim()
 
 # Determine runtime dependency package ids for all apps and whether any of the apps doesn't exist as a nuGet package
-$runtimeDependencyPackageIds, $newPackage = GetRuntimeDependencyPackageIds -apps $apps
+$runtimeDependencyPackageIds, $newPackage = GetRuntimeDependencyPackageIds -apps $apps -nuGetServerUrl $nuGetServerUrl -nuGetToken $nuGetToken
 
 # If artifact Version is empty or it is a starting version (like 20.0-) then determine which artifact versions are needed
 if ($artifactVersion -eq '' -or $artifactVersion.EndsWith('-')) {

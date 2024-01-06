@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       nuGetServerUrl:
-        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL or NUGETSERVERURL variable)
+        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL variable)
         required: false
         default: ''
       nuGetToken:
@@ -63,7 +63,7 @@ jobs:
         shell: pwsh
         env:
           nuGetToken: ${{ github.event.inputs.nuGetToken != '' && github.event.inputs.nuGetToken || (secrets.RUNTIMENUGETTOKEN != '' && secrets.RUNTIMENUGETTOKEN || secrets.NUGETTOKEN) }}
-          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || (vars.RUNTIMENUGETSERVERURL != '' && vars.RUNTIMENUGETSERVERURL || vars.NUGETSERVERURL) }}
+          nuGetServerUrl: ${{ github.event.inputs.nuGetServerUrl != '' && github.event.inputs.nuGetServerUrl || vars.RUNTIMENUGETSERVERURL }}
           apps: ${{ github.event.inputs.apps != '' && github.event.inputs.apps || secrets.APPS }}
           country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
           artifactVersion: ${{ github.event.inputs.artifactVersion != '' && github.event.inputs.artifactVersion || vars.ARTIFACTVERSION }}
