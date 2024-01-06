@@ -25,8 +25,13 @@ $incompatibleArtifactVersion = $env:incompatibleArtifactVersion
 # Runtime Dependency Package Ids is from the determine artifacts job
 $runtimeDependencyPackageIds = $env:runtimedependencyPackageIds | ConvertFrom-Json | ConvertTo-HashTable
 
+$licenseFileUrl = $env:licenseFileUrl
+if ([System.Version]$artifactVersion -ge [System.Version]'22.0.0.0') {
+    $licenseFileUrl = ''
+}
+
 # Create Runtime packages for main country and additional countries
-$runtimeAppFiles, $countrySpecificRuntimeAppFiles = GenerateRuntimeAppFiles -containerName $containerName -type $artifactType -country $country -additionalCountries $additionalCountries -artifactVersion $artifactVersion -apps $apps -dependencies $dependencies
+$runtimeAppFiles, $countrySpecificRuntimeAppFiles = GenerateRuntimeAppFiles -containerName $containerName -type $artifactType -country $country -additionalCountries $additionalCountries -artifactVersion $artifactVersion -apps $apps -dependencies $dependencies -licenseFileUrl $licenseFileUrl
 
 # For every app create and push nuGet package (unless the exact version already exists)
 foreach($appFile in $apps) {

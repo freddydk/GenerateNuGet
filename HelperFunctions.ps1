@@ -144,12 +144,13 @@ function GenerateRuntimeAppFiles {
         [string[]] $additionalCountries,
         [string] $artifactVersion,
         [string[]] $apps,
-        [string[]] $dependencies
+        [string[]] $dependencies,
+        [string] $licenseFileUrl
     )
     $artifacturl = Get-BCArtifactUrl -type $type -country $country -version $artifactVersion -select Closest
     $global:runtimeAppFiles = @{}
     $global:countrySpecificRuntimeAppFiles = @{}
-    Convert-BcAppsToRuntimePackages -containerName $containerName -artifactUrl $artifacturl -imageName '' -apps $apps -publishApps $dependencies -skipVerification -afterEachRuntimeCreation { Param($ht)
+    Convert-BcAppsToRuntimePackages -containerName $containerName -artifactUrl $artifacturl -imageName '' -apps $apps -publishApps $dependencies -licenseFile $licenseFileUrl -skipVerification -afterEachRuntimeCreation { Param($ht)
         if (-not $ht.runtimeFile) { throw "Could not generate runtime package" }
         $appName = [System.IO.Path]::GetFileName($ht.appFile)
         $global:runtimeAppFiles += @{ $appName = $ht.runtimeFile }
@@ -157,7 +158,7 @@ function GenerateRuntimeAppFiles {
     } | Out-Null
     foreach($ct in $additionalCountries) {
         $artifacturl = Get-BCArtifactUrl -type $type -country $ct -version $artifactVersion -select Closest
-        Convert-BcAppsToRuntimePackages -containerName $containerName -artifactUrl $artifacturl -imageName '' -apps $apps -publishApps $dependencies -skipVerification -afterEachRuntimeCreation { Param($ht)
+        Convert-BcAppsToRuntimePackages -containerName $containerName -artifactUrl $artifacturl -imageName '' -apps $apps -publishApps $dependencies -licenseFile $licenseFileUrl -skipVerification -afterEachRuntimeCreation { Param($ht)
             if (-not $ht.runtimeFile) { throw "Could not generate runtime package" }
             $appName = [System.IO.Path]::GetFileName($ht.appFile)
             $global:countrySpecificRuntimeAppFiles."$appName" += @{ $ct = $ht.runtimeFile }

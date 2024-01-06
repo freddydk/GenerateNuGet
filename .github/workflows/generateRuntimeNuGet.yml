@@ -4,6 +4,14 @@ name: Generate Runtime NuGet Packages
 on:
   workflow_dispatch:
     inputs:
+      nuGetServerUrl:
+        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL or NUGETSERVERURL variable)
+        required: false
+        default: ''
+      nuGetToken:
+        description: NuGet auth token (leave empty to use RUNTIMENUGETTOKEN or NUGETTOKEN secret)
+        required: false
+        default: ''
       apps:
         description: Comma separated list of apps (leave empty to use APPS secret)
         required: false
@@ -28,12 +36,8 @@ on:
         description: Type of Business Central artifacts to use, onprem or sandbox (leave empty to use ARTIFACTTYPE variable, default is sandbox)
         required: false
         default: ''
-      nuGetServerUrl:
-        description: NuGet server URL (leave empty to use RUNTIMENUGETSERVERURL or NUGETSERVERURL variable)
-        required: false
-        default: ''
-      nuGetToken:
-        description: NuGet auth token (leave empty to use RUNTIMENUGETTOKEN or NUGETTOKEN secret)
+      licenseFileUrl:
+        description: License File URL to use for versions before 22.0 (leave empty to use LICENSEFILEURL secret)
         required: false
         default: ''
 
@@ -95,6 +99,7 @@ jobs:
           country: ${{ github.event.inputs.country != '' && github.event.inputs.country || vars.COUNTRY }}
           additionalCountries: ${{ github.event.inputs.additionalCountries != '' && github.event.inputs.additionalCountries || vars.ADDITIONALCOUNTRIES }}
           artifactType: ${{ github.event.inputs.artifactType != '' && github.event.inputs.artifactType || vars.ARTIFACTTYPE }}
+          licenseFileUrl: ${{ github.event.inputs.licenseFileUrl != '' && github.event.inputs.licenseFileUrl || secrets.LICENSEFILEURL }}
           artifactVersion: ${{ matrix.artifactVersion }}
           incompatibleArtifactVersion: ${{ matrix.incompatibleArtifactVersion }}
           runtimeDependencyPackageIds: ${{ needs.DetermineArtifacts.outputs.runtimeDependencyPackageIds }}
